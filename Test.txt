@@ -1,0 +1,111 @@
+%{
+#include <math.h>
+#include <string.h>
+
+%}
+
+%option noyywrap
+%option never-interactive
+%x SINGLE_LINE_COMMENT
+%x MULTI_LINE_COMMENT
+
+INT_10 [0-9]+
+KEYWORD { if|else|elseif|case|when|do|while|next|last|redo|continue|for|until|unless|BEGIN|END|return|puts|yield|undef|true|false|then|super|self|retry|rescue|or
+|not|nil|module|in|ensure|define?|def|and|_FILE_|_LINE_|_ENCODING_ }
+
+BASE_16 0x([1-9]|[A-F])(([0-9][A-F])+)?
+BASE_8  0[1-7]([0-7]+)?
+FLOATING_POINT_CONSTANT  [-+]?(?:[0-9]*\.?[0-9]+|[0-9]+\.?[0-9]*)(?:[eE][-+]?[0-9]+)?
+
+%%
+
+
+{KEYWORD}  {printf("%s - ключевое слово\n", yytext);}
+
+
+
+
+\+ {printf("%s - арифметическая операция\n", yytext);}
+\- {printf("%s - арифметическая операция\n", yytext);}
+\* {printf("%s - арифметическая операция\n", yytext);}
+\/ {printf("%s - арифметическая операция\n", yytext);}
+
+
+= {printf("%s - операция присваивания\n", yytext);}
+\+= {printf("%s - операция присваивания\n", yytext);}
+-= {printf("%s - операция присваивания\n", yytext);}
+\*= {printf("%s - операция присваивания\n", yytext);}
+\/= {printf("%s - операция присваивания\n", yytext);}
+
+== {printf("%s - операция сравнения\n", yytext);}
+> {printf("%s - операция сравнения\n", yytext);}
+\< {printf("%s - операция сравнения\n", yytext);}
+\<= {printf("%s - операция сравнения\n", yytext);}
+>= {printf("%s - операция сравнения\n", yytext);}
+!= {printf("%s - операция сравнения\n", yytext);}
+\<=> {printf("%s - операция сравнения\n", yytext);}
+=== {printf("%s - операция сравнения\n", yytext);}
+.eql? {printf("%s - операция сравнения\n", yytext);}     //check
+equal? {printf("%s - операция сравнения\n", yytext);}
+
+\&\&  {printf("%s - Логическое И \n", yytext);}
+\&   {printf("%s - Оператор Поразрядное И\n", yytext);}
+\+\+ {printf("%s - инкремент\n", yytext);}
+-- {printf("%s - декремент\n", yytext);}
+\*\* {printf("%s - операция возведения в степень\n", yytext);}
+\:\:   {printf("%s - оператор Разрешение области видимости\n", yytext);}
+
+
+\(|\) {printf("%s - круглая скобка\n", yytext);}
+\{|\} {printf("%s - фигурная скобка\n", yytext);}
+\[|\] {printf("%s - квадратная скобка\n", yytext);}
+\<\< {printf("%s -Операторы поразрядного сдвига влево\n", yytext);}
+\>\> {printf("%s - Операторы поразрядного сдвига вправо\n", yytext);}
+\^  {printf("%s - Bitwise Оператор XOR \n", yytext);}
+\|  {printf("%s - Bitwise Оператор OR \n", yytext);}
+\?:  {printf("%s - тернарный выбор \n",yytext);}
+
+{BASE_16} {printf("%s - числовая константа в 16-й сс \n",yytext);}
+
+
+{BASE_8}  {printf("%s - числовая константа в 8-й сс |",yytext);
+int n = atoi(yytext);
+int remainder=0;
+int decimal=0, i=0;
+while(n!=0){
+remainder = n%10;
+n = n/10;
+decimal = decimal + (remainder*pow(8,i));
+++i;
+}
+printf(" (%d)\n",decimal);}
+
+
+[0-9]+ {printf("%d - числовая константа\n",atoi(yytext));}
+
+((\"|\')[_ 0-9A-Za-z]+(\"|\')) {
+char str2[100] = "";
+strcpy(str2, yytext);
+char str3[100] = "";
+for (int i = 0; i < strlen(yytext) - 2; i++)
+{
+str3[i] = str2[i+1];
+}
+printf("%s - сроковая константа\n", str3);}
+
+{FLOATING_POINT_CONSTANT} {printf("%f -found a floating point number\n", atof(yytext);}
+
+#(([_ A-Za-z0-9])+)? {printf("%s - комментарий\n", yytext);}
+
+
+((\$?|\@?|\@@)[_A-Za-z]([_A-Za-z0-9]+)?) {printf("%s - идентификатор\n", yytext);}
+
+[_a-z][_A-Za-z0-9]*: {printf("%s - идентификатор\n", yytext);}
+
+
+\; {printf("%s - конец команды\n", yytext);}
+\n {}
+\t {}
+. {}
+
+%%
