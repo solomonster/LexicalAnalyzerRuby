@@ -54,7 +54,6 @@ EXPONENT	 	(({NUM}|{FLOAT})[eE][+-]?{NUM})
 <DOUBLE_QUOTED_STRING>\\r           {strcat(literal,"\r");} 
 <DOUBLE_QUOTED_STRING>\\s           {strcat(literal,"\s");} 
 <DOUBLE_QUOTED_STRING>\\v           {strcat(literal,"\v");} 
-<DOUBLE_QUOTED_STRING>\\x           {strcat(literal,"\x");} 
 <DOUBLE_QUOTED_STRING>\\x[0-9a-fA-F]{2}   { append_special_char_by_hexcode(literal, yytext);}     
 <DOUBLE_QUOTED_STRING>\"			{ printf("Found double quoted literal \"%s\". From line %d to line %d\n", literal, startLine, yylineno); BEGIN(INITIAL);}
 
@@ -62,7 +61,7 @@ EXPONENT	 	(({NUM}|{FLOAT})[eE][+-]?{NUM})
 \'                         {BEGIN(SINGLE_QUOTED_STRING); literal[0] ='\0'; startLine=yylineno;}
 <SINGLE_QUOTED_STRING>[^\\']  {strcat(literal,yytext);}
 <SINGLE_QUOTED_STRING>\\'    {strcat(literal,"\'");}
-<SINGLE_QUOTED_STRING>\\\\  {strcat(literal,"\\")};
+<SINGLE_QUOTED_STRING>\\\\  {strcat(literal,"\\");}
 <SINGLE_QUOTED_STRING>\'  {printf("Found double quoted literal \"%s\". From line %d to line %d\n", literal, startLine, yylineno); BEGIN(INITIAL);}
 
 
